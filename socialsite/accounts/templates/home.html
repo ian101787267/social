@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }}!</p>
+            <a href="{% url 'create_post' %}">發布貼文</a>
+            <a href="{% url 'logout' %}">登出</a>
+        {% else %}
+            <a href="{% url 'signup' %}">創建帳號</a>
+            <a href="{% url 'login' %}">登入</a>
+        {% endif %}
+    </nav>
+    <div class="container">
+        <h2>貼文</h2>
+        {% for post in posts %}
+            <div class="post">
+                <p><strong>{{ post.user.username }}</strong>: {{ post.content }}</p>
+                <p><small>{{ post.created_at }}</small></p>
+                <a href="{% url 'create_comment' post.id %}">發布評論</a>
+                <div>
+                    {% for comment in post.comments.all %}
+                        <div class="comment">
+                            <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+                            <p><small>{{ comment.created_at }}</small></p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+        <h2>使用者</h2>
+        {% for user in users %}
+            <div class="post">
+                <p>{{ user.username }}</p>
+                <a href="{% url 'send_friend_request' user.id %}">發送好友邀請</a>
+            </div>
+        {% endfor %}
+        <h2>好友邀請</h2>
+        {% for request in friend_requests %}
+            <div class="post">
+                <p>{{ request.from_user.username }} 想當你的朋友</p>
+                <a href="{% url 'accept_friend_request' request.id %}">接受</a>
+            </div>
+        {% endfor %}
+        <h2>好友</h2>
+        {% if friends %}
+            {% for friend in friends %}
+                <div class="post">
+                    <p>{{ friend.username }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>還沒有朋友</p>
+        {% endif %}
+    </div>
+</body>
+</html>
